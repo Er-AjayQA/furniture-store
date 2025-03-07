@@ -1,11 +1,39 @@
+"use client";
+
 import { IoMdSearch } from "react-icons/io";
 import { IoIosHeart } from "react-icons/io";
 import { IoIosHeartEmpty } from "react-icons/io";
 import { GoStarFill } from "react-icons/go";
 import { GoStar } from "react-icons/go";
 import Link from "next/link";
+import { useDispatch, useSelector } from "react-redux";
+import { addToCart } from "../ReduxToolkit/CartSlice";
+import { addToWishlist } from "../ReduxToolkit/WishlistSlice";
+import { useEffect, useState } from "react";
 
 export default function ProductCard({ product }) {
+  const dispatch = useDispatch();
+  const wishlistItems = useSelector(
+    (wishlist) => wishlist.wishlist.wishlistItems
+  );
+  const [isInWishlist, setIsInWishlist] = useState(false);
+
+  useEffect(() => {
+    const status = wishlistItems.find((item) => item.id === product.id);
+
+    setIsInWishlist(status);
+  }, [wishlistItems]);
+
+  // Handle Adding Product To Cart
+  const handleAddToCart = () => {
+    dispatch(addToCart({ product }));
+  };
+
+  // Handle Adding Product To Wishlist
+  const handleAddToWishlist = () => {
+    dispatch(addToWishlist({ product }));
+  };
+
   return (
     <>
       <div className="flex flex-col">
@@ -19,8 +47,11 @@ export default function ProductCard({ product }) {
                 <IoMdSearch />
               </span>
             </Link>
-            <span className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-full bg-amber-400">
-              <IoIosHeartEmpty />
+            <span
+              className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-full bg-amber-400"
+              onClick={handleAddToWishlist}
+            >
+              {isInWishlist ? <IoIosHeart /> : <IoIosHeartEmpty />}
             </span>
           </div>
 
@@ -65,7 +96,10 @@ export default function ProductCard({ product }) {
           </div>
 
           <div>
-            <button className="my-5 h-10 w-full bg-violet-900 text-white">
+            <button
+              className="my-5 h-10 w-full bg-violet-900 text-white"
+              onClick={handleAddToCart}
+            >
               Add to cart
             </button>
           </div>
