@@ -17,7 +17,7 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <body>
         <Provider store={store}>
-          <ToastContainer position="bottom-right" />
+          <ToastContainer position="bottom-right" autoClose={1000} />
           <Header />
           {children}
           <Footer />

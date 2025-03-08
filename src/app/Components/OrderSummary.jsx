@@ -3,12 +3,32 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 
 export default function OrderSummary() {
   const [currentPage, setCurrentPage] = useState(false);
+  const [subTotalCartAmount, setSubTotalCartAmount] = useState("");
+  const [totalCartAmount, setTotalCartAmount] = useState("");
+  const cartItems = useSelector((cart) => cart.cart.cartItems);
 
   const path = usePathname();
 
+  // Calculating the Order Summary
+  useEffect(() => {
+    const subtotal = cartItems.reduce((acc, item) => {
+      const itemPrice =
+        item.discount_percentage > 0
+          ? Math.floor(item.price * (1 - item.discount_percentage / 100))
+          : item.price;
+      return acc + itemPrice * item.quantity;
+    }, 0);
+
+    setSubTotalCartAmount(subtotal);
+
+    setTotalCartAmount(subtotal);
+  }, [cartItems]);
+
+  // Handling Breadcrumb
   useEffect(() => {
     if (path.includes("cart")) {
       setCurrentPage(true);
@@ -27,7 +47,7 @@ export default function OrderSummary() {
 
             <div className="flex justify-between border-b py-5">
               <p>Subtotal</p>
-              <p>$1280</p>
+              <p>${subTotalCartAmount}</p>
             </div>
 
             <div className="flex justify-between border-b py-5">
@@ -37,7 +57,7 @@ export default function OrderSummary() {
 
             <div className="flex justify-between py-5">
               <p>Total</p>
-              <p>$1280</p>
+              <p>${totalCartAmount}</p>
             </div>
 
             {currentPage ? (

@@ -1,8 +1,10 @@
+import Link from "next/link";
+
 export default function CategoryCards({ category }) {
   return (
     <>
       {/* Category Card Start */}
-      <a href="#">
+      <Link href={`/catalog/${category.slug}`}>
         <div className="relative cursor-pointer">
           <img
             className="mx-auto h-auto w-auto brightness-50 duration-300 hover:brightness-100"
@@ -14,7 +16,7 @@ export default function CategoryCards({ category }) {
             {category.name}
           </p>
         </div>
-      </a>
+      </Link>
       {/* Category Card End */}
     </>
   );

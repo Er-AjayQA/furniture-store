@@ -1,10 +1,7 @@
 "use client";
 
-import { IoMdSearch } from "react-icons/io";
-import { IoIosHeart } from "react-icons/io";
-import { IoIosHeartEmpty } from "react-icons/io";
-import { GoStarFill } from "react-icons/go";
-import { GoStar } from "react-icons/go";
+import { IoMdSearch, IoIosHeartEmpty, IoIosHeart } from "react-icons/io";
+import { GoStar, GoStarFill } from "react-icons/go";
 import Link from "next/link";
 import { useDispatch, useSelector } from "react-redux";
 import { addToCart } from "../ReduxToolkit/CartSlice";
@@ -16,13 +13,24 @@ export default function ProductCard({ product }) {
   const wishlistItems = useSelector(
     (wishlist) => wishlist.wishlist.wishlistItems
   );
-  const [isInWishlist, setIsInWishlist] = useState(false);
+  const cartItems = useSelector((cart) => cart.cart.cartItems);
 
+  const [isInWishlist, setIsInWishlist] = useState(false);
+  const [isInCart, setIsInCart] = useState(false);
+
+  // Handle Check Product IsIn Wishlist
   useEffect(() => {
     const status = wishlistItems.find((item) => item.id === product.id);
 
     setIsInWishlist(status);
   }, [wishlistItems]);
+
+  // Handle Check Product IsIn Cart
+  useEffect(() => {
+    const status = cartItems.find((item) => item.id === product.id);
+
+    setIsInCart(status);
+  }, [cartItems]);
 
   // Handle Adding Product To Cart
   const handleAddToCart = () => {
@@ -97,10 +105,12 @@ export default function ProductCard({ product }) {
 
           <div>
             <button
-              className="my-5 h-10 w-full bg-violet-900 text-white"
+              className={`my-5 h-10 w-full ${
+                isInCart ? "bg-[#FBBF24] text-[#000]" : "bg-violet-900"
+              }  text-white`}
               onClick={handleAddToCart}
             >
-              Add to cart
+              {isInCart ? "Update Quantity" : "Add to cart"}
             </button>
           </div>
         </div>

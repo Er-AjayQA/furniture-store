@@ -5,14 +5,30 @@ import Breadcrumb from "./BreadCrumb";
 import RelatedProducts from "./RelatedProducts";
 import { GoStar, GoStarFill } from "react-icons/go";
 import { BsBagCheck } from "react-icons/bs";
-import { IoIosHeartEmpty } from "react-icons/io";
+import { IoMdSearch, IoIosHeartEmpty, IoIosHeart } from "react-icons/io";
 import { toast } from "react-toastify";
 import axios from "axios";
 import { useParams } from "next/navigation";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  addToCart,
+  removeFromCart,
+  updateQuantity,
+} from "../ReduxToolkit/CartSlice";
+import { addToWishlist } from "../ReduxToolkit/WishlistSlice";
 
 export default function ProductOverview() {
+  const wishlistitems = useSelector(
+    (wishlist) => wishlist.wishlist.wishlistItems
+  );
+  const cartItems = useSelector((cart) => cart.cart.cartItems);
+
+  const dispatch = useDispatch();
   const [relatedProducts, setRelatedProducts] = useState([]);
   const [productDetails, setProductDetails] = useState(null);
+  const [isInWishlist, setIsInWishlist] = useState(false);
+  const [isInCart, setIsInCart] = useState(false);
+  const [productQuantity, setProductQuantity] = useState(1);
 
   const param = useParams();
 
@@ -25,7 +41,6 @@ export default function ProductOverview() {
         },
       })
       .then((result) => {
-        console.log(result.data.product);
         setProductDetails(result.data.product);
       })
       .catch((error) => {
@@ -51,9 +66,94 @@ export default function ProductOverview() {
   }, [param.id]);
 
   const [mainImage, setMainImage] = useState(null);
+
   // Handle Change Current Image
   const handleCurrentImage = (image) => {
     setMainImage(image);
+  };
+
+  // Handle Add To Cart
+  const handleAddToCart = () => {
+    dispatch(addToCart({ product: productDetails }));
+  };
+
+  // Handle Add To Wishlist
+  const handleAddToWishlist = () => {
+    dispatch(addToWishlist({ product: productDetails }));
+  };
+
+  // Handle Check Product IsIn in Wishlist
+  useEffect(() => {
+    if (productDetails) {
+      const checkInWishlist = wishlistitems.find(
+        (item) => item.id === productDetails.id
+      );
+
+      if (checkInWishlist) {
+        setIsInWishlist(true);
+      } else {
+        setIsInWishlist(false);
+      }
+    }
+  }, [productDetails, wishlistitems]);
+
+  // Handle Check Product IsIn in Cart
+  useEffect(() => {
+    if (productDetails) {
+      const checkInCart = cartItems.find(
+        (item) => item.id === productDetails.id
+      );
+
+      if (checkInCart) {
+        setIsInCart(true);
+      } else {
+        setIsInCart(false);
+      }
+    }
+  }, [productDetails, cartItems]);
+
+  // Handle Product Current Quantity
+  useEffect(() => {
+    if (productDetails) {
+      const getProduct = cartItems.find(
+        (item) => item.id === productDetails.id
+      );
+
+      if (getProduct) {
+        setProductQuantity(getProduct.quantity);
+      } else {
+        setProductQuantity(1);
+      }
+    }
+  }, [productDetails, cartItems]);
+
+  // Handle Product quantity Update
+  const handleProdQuantity = (product, type) => {
+    const prod = cartItems.find((item) => item.id === product.id);
+
+    if (prod) {
+      if (type === "decrease" && prod.quantity === 1) {
+        dispatch(removeFromCart({ product: prod }));
+      } else {
+        dispatch(updateQuantity({ product: prod, type }));
+      }
+    } else if (!prod) {
+      if (type === "decrease") {
+        if (productQuantity > 1) {
+          setProductQuantity((prev) => prev - 1);
+          dispatch(addToCart({ product }));
+        } else {
+          toast.error("Add minimum 1 quantity");
+        }
+      } else {
+        if (productQuantity < product.stock) {
+          setProductQuantity((prev) => prev + 1);
+          dispatch(addToCart({ product }));
+        } else {
+          toast.error("Maximum stock reached");
+        }
+      }
+    }
   };
 
   return (
@@ -104,9 +204,9 @@ export default function ProductOverview() {
                 <div className="flex items-center">
                   {[...Array(5)].map((_, i) =>
                     i < productDetails.rating ? (
-                      <GoStarFill className="text-[#FACC15]" />
+                      <GoStarFill className="text-[#FACC15]" key={i} />
                     ) : (
-                      <GoStar className="text-[#FACC15]" />
+                      <GoStar className="text-[#FACC15]" key={i} />
                     )
                   )}
 
@@ -125,7 +225,7 @@ export default function ProductOverview() {
                 )}
               </p>
               <p className="font-bold">
-                Brand:{" "}
+                Brand:
                 <span className="font-normal">{productDetails.brand}</span>
               </p>
               <p className="font-bold">
@@ -135,25 +235,33 @@ export default function ProductOverview() {
                 </span>
               </p>
               <p className="font-bold">
-                SKU:{" "}
+                SKU:
                 <span className="font-normal">
                   {productDetails.sku ? productDetails.sku : "-/NIL"}
                 </span>
               </p>
 
               <p className="mt-4 text-4xl font-bold text-violet-900">
-                $
-                {Math.floor(
-                  productDetails.price *
-                    (1 - productDetails.discount_percentage / 100)
-                )}
-                {productDetails.discount_percentage <= 0 ? (
-                  ""
-                ) : (
-                  <span className="text-xs text-gray-400 line-through">
-                    ${productDetails.price}
+                {productDetails.discount_percentage > 0 ? (
+                  <span className="me-2">
+                    $
+                    {Math.floor(
+                      productDetails.price *
+                        (1 - productDetails.discount_percentage / 100)
+                    )}
                   </span>
+                ) : (
+                  ""
                 )}
+                <span
+                  className={`${
+                    productDetails.discount_percentage > 0
+                      ? "line-through opacity-50 text-red-400"
+                      : ""
+                  }`}
+                >
+                  {productDetails.price}
+                </span>
               </p>
 
               <p className="pt-5 text-sm leading-5 text-gray-500">
@@ -201,25 +309,45 @@ export default function ProductOverview() {
                 <p className="pb-2 text-xs text-gray-500">Quantity</p>
 
                 <div className="flex">
-                  <button className="flex h-8 w-8 cursor-pointer items-center justify-center border duration-100 hover:bg-neutral-100 focus:ring-2 focus:ring-gray-500 active:ring-2 active:ring-gray-500">
+                  <button
+                    className="flex h-8 w-8 cursor-pointer items-center justify-center border duration-100 hover:bg-neutral-100 focus:ring-2 focus:ring-gray-500 active:ring-2 active:ring-gray-500"
+                    onClick={() =>
+                      handleProdQuantity(productDetails, "decrease")
+                    }
+                  >
                     &minus;
                   </button>
                   <div className="flex h-8 w-8 cursor-text items-center justify-center border-t border-b active:ring-gray-500">
-                    1
+                    {productQuantity}
                   </div>
-                  <button className="flex h-8 w-8 cursor-pointer items-center justify-center border duration-100 hover:bg-neutral-100 focus:ring-2 focus:ring-gray-500 active:ring-2 active:ring-gray-500">
+                  <button
+                    className="flex h-8 w-8 cursor-pointer items-center justify-center border duration-100 hover:bg-neutral-100 focus:ring-2 focus:ring-gray-500 active:ring-2 active:ring-gray-500"
+                    onClick={() =>
+                      handleProdQuantity(productDetails, "increase")
+                    }
+                  >
                     &#43;
                   </button>
                 </div>
               </div>
 
               <div className="mt-7 flex flex-row items-center gap-6">
-                <button className="flex h-12 w-1/3 items-center justify-center bg-violet-900 text-white duration-100 hover:bg-blue-800">
+                <button
+                  className={`flex h-12 w-1/3 items-center justify-center text-white duration-100 hover:bg-blue-800 ${
+                    isInCart
+                      ? "bg-[#FBBF24] text-[#000] hover:text-[#fff]"
+                      : "bg-violet-900"
+                  }`}
+                  onClick={() => handleAddToCart(productDetails)}
+                >
                   <BsBagCheck />
-                  Add to cart
+                  {isInCart ? "Update Quantity" : "Add to cart"}
                 </button>
-                <button className="flex h-12 w-1/3 items-center justify-center bg-amber-400 duration-100 hover:bg-yellow-300">
-                  <IoIosHeartEmpty />
+                <button
+                  className="flex h-12 w-1/3 items-center justify-center bg-amber-400 duration-100 hover:bg-yellow-300"
+                  onClick={() => handleAddToWishlist(productDetails)}
+                >
+                  {isInWishlist ? <IoIosHeart /> : <IoIosHeartEmpty />}
                   Wishlist
                 </button>
               </div>
