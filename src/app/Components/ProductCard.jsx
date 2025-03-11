@@ -7,6 +7,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { addToCart } from "../ReduxToolkit/CartSlice";
 import { addToWishlist } from "../ReduxToolkit/WishlistSlice";
 import { useEffect, useState } from "react";
+import { Tooltip } from "flowbite-react";
 
 export default function ProductCard({ product }) {
   const dispatch = useDispatch();
@@ -34,6 +35,7 @@ export default function ProductCard({ product }) {
 
   // Handle Adding Product To Cart
   const handleAddToCart = () => {
+    console.log(product);
     dispatch(addToCart({ product }));
   };
 
@@ -52,14 +54,21 @@ export default function ProductCard({ product }) {
               href={`/product-overview/${product.category_slug}/${product.id}`}
             >
               <span className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-full bg-amber-400">
-                <IoMdSearch />
+                <Tooltip content="Details" placement="bottom">
+                  <IoMdSearch />
+                </Tooltip>
               </span>
             </Link>
             <span
               className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-full bg-amber-400"
               onClick={handleAddToWishlist}
             >
-              {isInWishlist ? <IoIosHeart /> : <IoIosHeartEmpty />}
+              <Tooltip
+                content={isInWishlist ? "Remove" : "Add"}
+                placement="bottom"
+              >
+                {isInWishlist ? <IoIosHeart /> : <IoIosHeartEmpty />}
+              </Tooltip>
             </span>
           </div>
 
@@ -84,7 +93,7 @@ export default function ProductCard({ product }) {
               product.price * (1 - product.discount_percentage / 100)
             )}
             {product.discount_percentage >= 1 ? (
-              <span className="text-sm text-gray-500 line-through ms-1">
+              <span className="text-sm text-red-500 line-through ms-1">
                 ${product.price}
               </span>
             ) : (
@@ -105,12 +114,21 @@ export default function ProductCard({ product }) {
 
           <div>
             <button
-              className={`my-5 h-10 w-full ${
-                isInCart ? "bg-[#FBBF24] text-[#000]" : "bg-violet-900"
-              }  text-white`}
+              className={`my-5 h-10 w-full  text-white ${
+                product.stock > 0
+                  ? isInCart
+                    ? "bg-[#FBBF24] text-[#000]"
+                    : "bg-violet-900"
+                  : "bg-red-500 cursor-not-allowed"
+              }`}
               onClick={handleAddToCart}
+              disabled={product.stock > 0 ? "" : "disabled"}
             >
-              {isInCart ? "Update Quantity" : "Add to cart"}
+              {product.stock > 0
+                ? isInCart
+                  ? "Update Quantity"
+                  : "Add to Cart"
+                : "Out of Stock"}
             </button>
           </div>
         </div>

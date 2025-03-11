@@ -11,16 +11,16 @@ export default function Cart() {
   const cartItems = useSelector((cart) => cart.cart.cartItems);
 
   // Handle Remove Product from Cart
-  const handleRemoveFromCart = (product) => {
-    dispatch(removeFromCart({ product }));
+  const handleRemoveFromCart = (id) => {
+    dispatch(removeFromCart({ id }));
   };
 
   // Handle Product Quantity Update
-  const handleProdQuantity = (product, type) => {
+  const handleProdQuantity = (product, type, stock) => {
     if (type === "decrease" && product.quantity === 1) {
-      dispatch(removeFromCart({ product }));
+      dispatch(removeFromCart({ id: product.id }));
     } else {
-      dispatch(updateQuantity({ product, type }));
+      dispatch(updateQuantity({ id: product.id, type, stock }));
     }
   };
 
@@ -36,16 +36,12 @@ export default function Cart() {
         <section className="container mx-auto my-3 flex w-full flex-col gap-3 px-4 md:hidden">
           {cartItems.length >= 1 ? (
             cartItems.map((product) => {
-              const singleUnitPrice = product?.discount_percentage
-                ? Math.floor(
-                    product?.price * (1 - product?.discount_percentage / 100)
-                  )
-                : product?.price;
+              const singleUnitPrice = product.discountedPrice;
 
               return (
-                <div key={product?.id} className="flex w-full border px-4 py-4">
+                <div key={product.id} className="flex w-full border px-4 py-4">
                   <Link
-                    href={`/product-overview/${product?.category_slug}/${product.id}`}
+                    href={`/product-overview/${product.categorySlug}/${product.id}`}
                   >
                     <img
                       className="self-start object-contain"
@@ -57,7 +53,7 @@ export default function Cart() {
 
                   <div className="ml-3 flex w-full flex-col justify-center">
                     <div className="flex items-center justify-between">
-                      <p className="text-xl font-bold">{product?.name}</p>
+                      <p className="text-xl font-bold">{product.name}</p>
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         viewBox="0 0 20 20"
@@ -76,18 +72,26 @@ export default function Cart() {
                         <button
                           className="flex h-8 w-8 cursor-pointer items-center justify-center border duration-100 hover:bg-neutral-100 focus:ring-2 focus:ring-gray-500 active:ring-2 active:ring-gray-500"
                           onClick={() =>
-                            handleProdQuantity(product, "decrease")
+                            handleProdQuantity(
+                              product,
+                              "decrease",
+                              product.stock
+                            )
                           }
                         >
                           &minus;
                         </button>
                         <div className="flex h-8 w-8 cursor-text items-center justify-center border-t border-b active:ring-gray-500">
-                          {product?.quantity}
+                          {product.quantity}
                         </div>
                         <button
                           className="flex h-8 w-8 cursor-pointer items-center justify-center border duration-100 hover:bg-neutral-100 focus:ring-2 focus:ring-gray-500 active:ring-2 active:ring-gray-500"
                           onClick={() =>
-                            handleProdQuantity(product, "increase")
+                            handleProdQuantity(
+                              product,
+                              "increase",
+                              product.stock
+                            )
                           }
                         >
                           &#43;
@@ -99,7 +103,7 @@ export default function Cart() {
                         viewBox="0 0 20 20"
                         fill="currentColor"
                         className="m-0 h-5 w-5 cursor-pointer"
-                        onClick={() => handleRemoveFromCart(product)}
+                        onClick={() => handleRemoveFromCart(product.id)}
                       >
                         <path
                           fillRule="evenodd"
@@ -137,29 +141,24 @@ export default function Cart() {
               </thead>
               <tbody>
                 {cartItems.map((product) => {
-                  const singleUnitPrice = product?.discount_percentage
-                    ? Math.floor(
-                        product?.price *
-                          (1 - product?.discount_percentage / 100)
-                      )
-                    : product?.price;
+                  const singleUnitPrice = product.discountedPrice;
 
                   return (
-                    <tr key={product?.id} className="h-[100px] border-b">
+                    <tr key={product.id} className="h-[100px] border-b">
                       <td className="align-middle">
                         <div className="flex">
                           <Link
-                            href={`/product-overview/${product?.category_slug}/${product.id}`}
+                            href={`/product-overview/${product.categorySlug}/${product.id}`}
                           >
                             <img
                               className="w-[90px]"
-                              src={product?.image}
+                              src={product.image}
                               alt="bedroom image"
                             />
                           </Link>
 
                           <div className="ml-3 flex flex-col justify-center">
-                            <p className="text-xl font-bold">{product?.name}</p>
+                            <p className="text-xl font-bold">{product.name}</p>
                             <p className="text-sm text-gray-400">Size: XL</p>
                           </div>
                         </div>
@@ -172,18 +171,26 @@ export default function Cart() {
                           <button
                             className="flex h-8 w-8 cursor-pointer items-center justify-center border duration-100 hover:bg-neutral-100 focus:ring-2 focus:ring-gray-500 active:ring-2 active:ring-gray-500"
                             onClick={() =>
-                              handleProdQuantity(product, "decrease")
+                              handleProdQuantity(
+                                product,
+                                "decrease",
+                                product.stock
+                              )
                             }
                           >
                             &minus;
                           </button>
                           <div className="flex h-8 w-8 cursor-text items-center justify-center border-t border-b active:ring-gray-500">
-                            {product?.quantity}
+                            {product.quantity}
                           </div>
                           <button
                             className="flex h-8 w-8 cursor-pointer items-center justify-center border duration-100 hover:bg-neutral-100 focus:ring-2 focus:ring-gray-500 active:ring-2 active:ring-gray-500"
                             onClick={() =>
-                              handleProdQuantity(product, "increase")
+                              handleProdQuantity(
+                                product,
+                                "increase",
+                                product.stock
+                              )
                             }
                           >
                             &#43;
@@ -191,12 +198,12 @@ export default function Cart() {
                         </div>
                       </td>
                       <td className="mx-auto text-center">
-                        ${singleUnitPrice * product?.quantity}
+                        ${singleUnitPrice * product.quantity}
                       </td>
                       <td className="align-middle">
                         <MdDeleteSweep
                           className="text-[25px] hover:text-red-600 cursor-pointer"
-                          onClick={() => handleRemoveFromCart(product)}
+                          onClick={() => handleRemoveFromCart(product.id)}
                         />
                       </td>
                     </tr>

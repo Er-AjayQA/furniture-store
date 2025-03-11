@@ -16,10 +16,7 @@ export default function OrderSummary() {
   // Calculating the Order Summary
   useEffect(() => {
     const subtotal = cartItems.reduce((acc, item) => {
-      const itemPrice =
-        item.discount_percentage > 0
-          ? Math.floor(item.price * (1 - item.discount_percentage / 100))
-          : item.price;
+      const itemPrice = item.discountedPrice;
       return acc + itemPrice * item.quantity;
     }, 0);
 

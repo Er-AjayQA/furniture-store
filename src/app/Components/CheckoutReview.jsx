@@ -1,8 +1,31 @@
+"use client";
+
 import Link from "next/link";
 import Breadcrumb from "./BreadCrumb";
 import OrderSummary from "./OrderSummary";
+import { useDispatch, useSelector } from "react-redux";
+import { removeFromCart, updateQuantity } from "../ReduxToolkit/CartSlice";
+import { toast } from "react-toastify";
+import { MdDeleteSweep } from "react-icons/md";
 
 export default function CheckoutReview() {
+  const cartItems = useSelector((cart) => cart.cart.cartItems);
+  const dispatch = useDispatch();
+
+  // Handle Product Quantity Update
+  const handleProdQuantity = (product, type, stock) => {
+    if (type === "decrease" && product.quantity < 2) {
+      toast.error("Minimum 1 quantity of should be available for order!!");
+    } else {
+      dispatch(updateQuantity({ id: product.id, type, stock }));
+    }
+  };
+
+  // Handle Remove from Order List
+  const handleRemoveFromCart = (id) => {
+    dispatch(removeFromCart({ id }));
+  };
+
   return (
     <>
       {/* Checkout Review Breadcrumb Start */}
@@ -17,267 +40,294 @@ export default function CheckoutReview() {
           </h2>
 
           {/* Form Start */}
+
           <section className="grid w-full max-w-[1200px] grid-cols-1 gap-3 px-5 pb-10">
-            <table className="hidden lg:table">
-              <thead className="h-16 bg-neutral-100">
-                <tr>
-                  <th>ADDRESS</th>
-                  <th>DELIVERY METHOD</th>
-                  <th>PAYMENT METHOD</th>
-                  <th className="bg-neutral-600 text-white">ORDER REVIEW</th>
-                </tr>
-              </thead>
-            </table>
-
-            {/* Mobile Product Table Start */}
-            <section className="container mx-auto my-3 flex w-full flex-col gap-3 md:hidden">
-              <div className="flex w-full border px-4 py-4">
-                <img
-                  className="self-start object-contain"
-                  width="90px"
-                  src="/images/bedroom.png"
-                  alt="bedroom image"
-                />
-                <div className="ml-3 flex w-full flex-col justify-center">
-                  <div className="flex items-center justify-between">
-                    <p className="text-xl font-bold">ITALIAN BED</p>
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 20 20"
-                      fill="currentColor"
-                      className="h-5 w-5"
-                    >
-                      <path d="M9.653 16.915l-.005-.003-.019-.01a20.759 20.759 0 01-1.162-.682 22.045 22.045 0 01-2.582-1.9C4.045 12.733 2 10.352 2 7.5a4.5 4.5 0 018-2.828A4.5 4.5 0 0118 7.5c0 2.852-2.044 5.233-3.885 6.82a22.049 22.049 0 01-3.744 2.582l-.019.01-.005.003h-.002a.739.739 0 01-.69.001l-.002-.001z" />
-                    </svg>
-                  </div>
-                  <p className="text-sm text-gray-400">Size: XL</p>
-                  <p className="py-3 text-xl font-bold text-violet-900">$320</p>
-                  <div className="mt-2 flex w-full items-center justify-between">
-                    <div className="flex items-center justify-center">
-                      <div className="flex cursor-text items-center justify-center active:ring-gray-500">
-                        Quantity: 1
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex w-full border px-4 py-4">
-                <img
-                  className="self-start object-contain"
-                  width="90px"
-                  src="/images/product-chair.png"
-                  alt="Chair image"
-                />
-                <div className="ml-3 flex w-full flex-col justify-center">
-                  <div className="flex items-center justify-between">
-                    <p className="text-xl font-bold">GUYER CHAIR</p>
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 20 20"
-                      fill="currentColor"
-                      className="h-5 w-5"
-                    >
-                      <path d="M9.653 16.915l-.005-.003-.019-.01a20.759 20.759 0 01-1.162-.682 22.045 22.045 0 01-2.582-1.9C4.045 12.733 2 10.352 2 7.5a4.5 4.5 0 018-2.828A4.5 4.5 0 0118 7.5c0 2.852-2.044 5.233-3.885 6.82a22.049 22.049 0 01-3.744 2.582l-.019.01-.005.003h-.002a.739.739 0 01-.69.001l-.002-.001z" />
-                    </svg>
-                  </div>
-                  <p className="text-sm text-gray-400">Size: XL</p>
-                  <p className="py-3 text-xl font-bold text-violet-900">$320</p>
-                  <div className="mt-2 flex w-full items-center justify-between">
-                    <div className="flex items-center justify-center">
-                      <div className="flex cursor-text items-center justify-center active:ring-gray-500">
-                        Quantity: 1
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex w-full border px-4 py-4">
-                <img
-                  className="self-start object-contain"
-                  width="90px"
-                  src="/images/outdoors.png"
-                  alt="Outdoor chair image"
-                />
-                <div className="ml-3 flex w-full flex-col justify-center">
-                  <div className="flex items-center justify-between">
-                    <p className="text-xl font-bold">OUTDOOR CHAIR</p>
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 20 20"
-                      fill="currentColor"
-                      className="h-5 w-5"
-                    >
-                      <path d="M9.653 16.915l-.005-.003-.019-.01a20.759 20.759 0 01-1.162-.682 22.045 22.045 0 01-2.582-1.9C4.045 12.733 2 10.352 2 7.5a4.5 4.5 0 018-2.828A4.5 4.5 0 0118 7.5c0 2.852-2.044 5.233-3.885 6.82a22.049 22.049 0 01-3.744 2.582l-.019.01-.005.003h-.002a.739.739 0 01-.69.001l-.002-.001z" />
-                    </svg>
-                  </div>
-                  <p className="text-sm text-gray-400">Size: XL</p>
-                  <p className="py-3 text-xl font-bold text-violet-900">$320</p>
-                  <div className="mt-2 flex w-full items-center justify-between">
-                    <div className="flex items-center justify-center">
-                      <div className="flex cursor-text items-center justify-center active:ring-gray-500">
-                        Quantity: 1
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex w-full border px-4 py-4">
-                <img
-                  className="self-start object-contain"
-                  width="90px"
-                  src="/images/matrass.png"
-                  alt="Matrass image"
-                />
-                <div className="ml-3 flex w-full flex-col justify-center">
-                  <div className="flex items-center justify-between">
-                    <p className="text-xl font-bold">MATRASS COMFORT &plus;</p>
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 20 20"
-                      fill="currentColor"
-                      className="h-5 w-5"
-                    >
-                      <path d="M9.653 16.915l-.005-.003-.019-.01a20.759 20.759 0 01-1.162-.682 22.045 22.045 0 01-2.582-1.9C4.045 12.733 2 10.352 2 7.5a4.5 4.5 0 018-2.828A4.5 4.5 0 0118 7.5c0 2.852-2.044 5.233-3.885 6.82a22.049 22.049 0 01-3.744 2.582l-.019.01-.005.003h-.002a.739.739 0 01-.69.001l-.002-.001z" />
-                    </svg>
-                  </div>
-                  <p className="text-sm text-gray-400">Size: XL</p>
-                  <p className="py-3 text-xl font-bold text-violet-900">$320</p>
-                  <div className="mt-2 flex w-full items-center justify-between">
-                    <div className="flex items-center justify-center">
-                      <div className="flex cursor-text items-center justify-center active:ring-gray-500">
-                        Quantity: 1
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </section>
-            {/* Mobile Product Table End */}
-
-            {/* Product Table Start */}
-            <table className="mt-3 hidden w-full lg:table">
-              <thead className="h-16 bg-neutral-100">
-                <tr>
-                  <th>ITEM</th>
-                  <th>PRICE</th>
-                  <th>QUANTITY</th>
-                  <th>TOTAL</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr className="h-[100px] border-b">
-                  <td className="align-middle">
-                    <div className="flex">
-                      <img
-                        className="w-[90px]"
-                        src="/images/bedroom.png"
-                        alt="bedroom image"
-                      />
-                      <div className="ml-3 flex flex-col justify-center">
+            {cartItems.length < 1 ? (
+              <p className="text-center">No Items Selected for Order!!</p>
+            ) : (
+              <>
+                <table className="hidden lg:table">
+                  <thead className="h-16 bg-neutral-100">
+                    <tr>
+                      <th>ADDRESS</th>
+                      <th>DELIVERY METHOD</th>
+                      <th>PAYMENT METHOD</th>
+                      <th className="bg-neutral-600 text-white">
+                        ORDER REVIEW
+                      </th>
+                    </tr>
+                  </thead>
+                </table>
+                {/* Mobile Product Table Start */}
+                <section className="container mx-auto my-3 flex w-full flex-col gap-3 md:hidden">
+                  <div className="flex w-full border px-4 py-4">
+                    <img
+                      className="self-start object-contain"
+                      width="90px"
+                      src="/images/bedroom.png"
+                      alt="bedroom image"
+                    />
+                    <div className="ml-3 flex w-full flex-col justify-center">
+                      <div className="flex items-center justify-between">
                         <p className="text-xl font-bold">ITALIAN BED</p>
-                        <p className="text-sm text-gray-400">Size: XL</p>
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          viewBox="0 0 20 20"
+                          fill="currentColor"
+                          className="h-5 w-5"
+                        >
+                          <path d="M9.653 16.915l-.005-.003-.019-.01a20.759 20.759 0 01-1.162-.682 22.045 22.045 0 01-2.582-1.9C4.045 12.733 2 10.352 2 7.5a4.5 4.5 0 018-2.828A4.5 4.5 0 0118 7.5c0 2.852-2.044 5.233-3.885 6.82a22.049 22.049 0 01-3.744 2.582l-.019.01-.005.003h-.002a.739.739 0 01-.69.001l-.002-.001z" />
+                        </svg>
+                      </div>
+                      <p className="text-sm text-gray-400">Size: XL</p>
+                      <p className="py-3 text-xl font-bold text-violet-900">
+                        $320
+                      </p>
+                      <div className="mt-2 flex w-full items-center justify-between">
+                        <div className="flex items-center justify-center">
+                          <div className="flex cursor-text items-center justify-center active:ring-gray-500">
+                            Quantity: 1
+                          </div>
+                        </div>
                       </div>
                     </div>
-                  </td>
-                  <td className="mx-auto text-center">&#36;320</td>
-                  <td className="text-center align-middle">1</td>
-                  <td className="mx-auto text-center">&#36;320</td>
-                </tr>
+                  </div>
 
-                <tr className="h-[100px] border-b">
-                  <td className="align-middle">
-                    <div className="flex">
-                      <img
-                        className="w-[90px]"
-                        src="/images/product-chair.png"
-                        alt="Chair Image"
-                      />
-                      <div className="ml-3 flex flex-col justify-center">
+                  <div className="flex w-full border px-4 py-4">
+                    <img
+                      className="self-start object-contain"
+                      width="90px"
+                      src="/images/product-chair.png"
+                      alt="Chair image"
+                    />
+                    <div className="ml-3 flex w-full flex-col justify-center">
+                      <div className="flex items-center justify-between">
                         <p className="text-xl font-bold">GUYER CHAIR</p>
-                        <p className="text-sm text-gray-400">Size: XL</p>
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          viewBox="0 0 20 20"
+                          fill="currentColor"
+                          className="h-5 w-5"
+                        >
+                          <path d="M9.653 16.915l-.005-.003-.019-.01a20.759 20.759 0 01-1.162-.682 22.045 22.045 0 01-2.582-1.9C4.045 12.733 2 10.352 2 7.5a4.5 4.5 0 018-2.828A4.5 4.5 0 0118 7.5c0 2.852-2.044 5.233-3.885 6.82a22.049 22.049 0 01-3.744 2.582l-.019.01-.005.003h-.002a.739.739 0 01-.69.001l-.002-.001z" />
+                        </svg>
+                      </div>
+                      <p className="text-sm text-gray-400">Size: XL</p>
+                      <p className="py-3 text-xl font-bold text-violet-900">
+                        $320
+                      </p>
+                      <div className="mt-2 flex w-full items-center justify-between">
+                        <div className="flex items-center justify-center">
+                          <div className="flex cursor-text items-center justify-center active:ring-gray-500">
+                            Quantity: 1
+                          </div>
+                        </div>
                       </div>
                     </div>
-                  </td>
-                  <td className="mx-auto text-center">&#36;320</td>
-                  <td className="text-center align-middle">1</td>
-                  <td className="mx-auto text-center">&#36;320</td>
-                </tr>
+                  </div>
 
-                <tr className="h-[100px] border-b">
-                  <td className="align-middle">
-                    <div className="flex">
-                      <img
-                        className="w-[90px]"
-                        src="/images/outdoors.png"
-                        alt="Outdoor furniture"
-                      />
-                      <div className="ml-3 flex flex-col justify-center">
+                  <div className="flex w-full border px-4 py-4">
+                    <img
+                      className="self-start object-contain"
+                      width="90px"
+                      src="/images/outdoors.png"
+                      alt="Outdoor chair image"
+                    />
+                    <div className="ml-3 flex w-full flex-col justify-center">
+                      <div className="flex items-center justify-between">
                         <p className="text-xl font-bold">OUTDOOR CHAIR</p>
-                        <p className="text-sm text-gray-400">Size: XL</p>
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          viewBox="0 0 20 20"
+                          fill="currentColor"
+                          className="h-5 w-5"
+                        >
+                          <path d="M9.653 16.915l-.005-.003-.019-.01a20.759 20.759 0 01-1.162-.682 22.045 22.045 0 01-2.582-1.9C4.045 12.733 2 10.352 2 7.5a4.5 4.5 0 018-2.828A4.5 4.5 0 0118 7.5c0 2.852-2.044 5.233-3.885 6.82a22.049 22.049 0 01-3.744 2.582l-.019.01-.005.003h-.002a.739.739 0 01-.69.001l-.002-.001z" />
+                        </svg>
+                      </div>
+                      <p className="text-sm text-gray-400">Size: XL</p>
+                      <p className="py-3 text-xl font-bold text-violet-900">
+                        $320
+                      </p>
+                      <div className="mt-2 flex w-full items-center justify-between">
+                        <div className="flex items-center justify-center">
+                          <div className="flex cursor-text items-center justify-center active:ring-gray-500">
+                            Quantity: 1
+                          </div>
+                        </div>
                       </div>
                     </div>
-                  </td>
-                  <td className="mx-auto text-center">&#36;320</td>
-                  <td className="text-center align-middle">1</td>
-                  <td className="mx-auto text-center">&#36;320</td>
-                </tr>
+                  </div>
 
-                <tr className="h-[100px]">
-                  <td className="align-middle">
-                    <div className="flex">
-                      <img
-                        className="w-[90px]"
-                        src="/images/matrass.png"
-                        alt="Matrass Image"
-                      />
-                      <div className="ml-3 flex flex-col justify-center">
+                  <div className="flex w-full border px-4 py-4">
+                    <img
+                      className="self-start object-contain"
+                      width="90px"
+                      src="/images/matrass.png"
+                      alt="Matrass image"
+                    />
+                    <div className="ml-3 flex w-full flex-col justify-center">
+                      <div className="flex items-center justify-between">
                         <p className="text-xl font-bold">
                           MATRASS COMFORT &plus;
                         </p>
-                        <p className="text-sm text-gray-400">Size: XL</p>
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          viewBox="0 0 20 20"
+                          fill="currentColor"
+                          className="h-5 w-5"
+                        >
+                          <path d="M9.653 16.915l-.005-.003-.019-.01a20.759 20.759 0 01-1.162-.682 22.045 22.045 0 01-2.582-1.9C4.045 12.733 2 10.352 2 7.5a4.5 4.5 0 018-2.828A4.5 4.5 0 0118 7.5c0 2.852-2.044 5.233-3.885 6.82a22.049 22.049 0 01-3.744 2.582l-.019.01-.005.003h-.002a.739.739 0 01-.69.001l-.002-.001z" />
+                        </svg>
+                      </div>
+                      <p className="text-sm text-gray-400">Size: XL</p>
+                      <p className="py-3 text-xl font-bold text-violet-900">
+                        $320
+                      </p>
+                      <div className="mt-2 flex w-full items-center justify-between">
+                        <div className="flex items-center justify-center">
+                          <div className="flex cursor-text items-center justify-center active:ring-gray-500">
+                            Quantity: 1
+                          </div>
+                        </div>
                       </div>
                     </div>
-                  </td>
-                  <td className="mx-auto text-center">&#36;320</td>
-                  <td className="text-center align-middle">1</td>
-                  <td className="mx-auto text-center">&#36;320</td>
-                </tr>
-              </tbody>
-            </table>
-            {/* Product Table End */}
+                  </div>
+                </section>
+                {/* Mobile Product Table End */}
 
-            <div className="flex w-full items-center justify-between">
-              <a
-                href="catalog.html"
-                className="hidden text-sm text-violet-900 lg:block"
-              >
-                &larr; Back to the shop
-              </a>
+                {/* Product Table Start */}
+                <table className="mt-3 hidden w-full lg:table">
+                  <thead className="h-16 bg-neutral-100">
+                    <tr>
+                      <th>Item</th>
+                      <th>Price</th>
+                      <th>Qty</th>
+                      <th>Total</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {cartItems.map((product) => {
+                      return (
+                        <tr key={product.id} className="h-[100px] border-b">
+                          <td className="align-middle">
+                            <div className="flex">
+                              <Link
+                                href={`/product-overview/${product.categorySlug}/${product.id}`}
+                              >
+                                <img
+                                  className="w-[90px]"
+                                  src={product.image}
+                                  alt={product.name}
+                                />
+                              </Link>
 
-              <div className="mx-auto flex justify-center gap-2 lg:mx-0">
-                <Link
-                  href="/checkout-payment"
-                  className="bg-purple-900 px-4 py-2 text-white"
-                >
-                  Previous step
-                </Link>
+                              <div className="ml-3 flex flex-col justify-center">
+                                <p className="text-xl font-bold">
+                                  {product.name}
+                                </p>
+                                <p className="text-sm text-gray-400">
+                                  Size: XL
+                                </p>
+                              </div>
+                            </div>
+                          </td>
+                          <td className="mx-auto text-center">
+                            $
+                            {product.discount > 0
+                              ? product.discountedPrice
+                              : product.price}
+                          </td>
+                          <td className="align-middle">
+                            <div className="flex items-center justify-center">
+                              <button
+                                className={`flex h-8 w-8 cursor-pointer items-center justify-center border duration-100 hover:bg-neutral-100 focus:ring-2 focus:ring-gray-500 active:ring-2 active:ring-gray-500 ${
+                                  product.quantity === 1
+                                    ? "cursor-not-allowed opacity-75"
+                                    : ""
+                                }`}
+                                disabled={
+                                  product.quantity === 1 ? "disabled" : ""
+                                }
+                                onClick={() =>
+                                  handleProdQuantity(
+                                    product,
+                                    "decrease",
+                                    product.stock
+                                  )
+                                }
+                              >
+                                &minus;
+                              </button>
+                              <div className="flex h-8 w-8 cursor-text items-center justify-center border-t border-b active:ring-gray-500">
+                                {product.quantity}
+                              </div>
+                              <button
+                                className="flex h-8 w-8 cursor-pointer items-center justify-center border duration-100 hover:bg-neutral-100 focus:ring-2 focus:ring-gray-500 active:ring-2 active:ring-gray-500"
+                                onClick={() =>
+                                  handleProdQuantity(
+                                    product,
+                                    "increase",
+                                    product.stock
+                                  )
+                                }
+                              >
+                                &#43;
+                              </button>
+                            </div>
+                          </td>
+                          <td className="mx-auto text-center">
+                            $
+                            {product.discount > 0
+                              ? product.discountedPrice * product.quantity
+                              : product.price * product.quantity}
+                          </td>
+                          <td className="align-middle text-center">
+                            <MdDeleteSweep
+                              className="text-[25px] hover:text-red-600 cursor-pointer mx-auto"
+                              onClick={() => handleRemoveFromCart(product.id)}
+                            />
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+                {/* Product Table End */}
 
-                <Link
-                  href="/checkout-confirmation"
-                  className="bg-amber-400 px-4 py-2"
-                >
-                  Place Order
-                </Link>
-              </div>
-            </div>
+                <div className="flex w-full items-center justify-between">
+                  <a
+                    href="catalog.html"
+                    className="hidden text-sm text-violet-900 lg:block"
+                  >
+                    &larr; Back to the shop
+                  </a>
+
+                  <div className="mx-auto flex justify-center gap-2 lg:mx-0">
+                    <Link
+                      href="/checkout-payment"
+                      className="bg-purple-900 px-4 py-2 text-white"
+                    >
+                      Previous step
+                    </Link>
+
+                    <Link
+                      href="/checkout-confirmation"
+                      className="bg-amber-400 px-4 py-2"
+                    >
+                      Place Order
+                    </Link>
+                  </div>
+                </div>
+              </>
+            )}
           </section>
+
           {/* Form End */}
 
           {/* Summary Start */}
-          <OrderSummary />
+          {cartItems.length > 0 ? <OrderSummary /> : ""}
           {/* Summary End */}
         </section>
 

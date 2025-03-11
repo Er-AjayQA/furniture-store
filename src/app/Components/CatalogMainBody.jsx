@@ -405,17 +405,6 @@ export default function CatalogMainBody() {
                 );
               })
             )}
-            {/* {getAllProducts.length <= 0 ? (
-              <p className="text-center">No Products Available!!</p>
-            ) : (
-              getAllProducts.map((product) => {
-                return changeView ? (
-                  <ProductRowView key={product.id} product={product} />
-                ) : (
-                  <ProductCard key={product.id} product={product} />
-                );
-              })
-            )} */}
           </section>
           {/* Product Listing End */}
 

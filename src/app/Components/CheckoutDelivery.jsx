@@ -36,7 +36,11 @@ export default function CheckoutDelivery() {
                 <div className="flex w-full justify-between gap-2">
                   <div className="flex w-full cursor-pointer flex-col border">
                     <div className="flex bg-amber-400 px-4 py-2">
-                      <input className="outline-yellow-400" type="radio" />
+                      <input
+                        className="outline-yellow-400"
+                        type="radio"
+                        name="delivery-method"
+                      />
 
                       <p className="ml-3 font-bold">DHL, next day</p>
                     </div>
@@ -54,7 +58,11 @@ export default function CheckoutDelivery() {
 
                 <div className="flex w-full cursor-pointer flex-col border">
                   <div className="flex bg-amber-400 px-4 py-2">
-                    <input className="outline-yellow-400" type="radio" />
+                    <input
+                      className="outline-yellow-400"
+                      type="radio"
+                      name="delivery-method"
+                    />
 
                     <p className="ml-3 cursor-pointer font-bold">
                       SDEK, 3 hours
@@ -75,7 +83,11 @@ export default function CheckoutDelivery() {
 
                 <div className="flex w-full cursor-pointer flex-col border">
                   <div className="flex bg-amber-400 px-4 py-2">
-                    <input className="outline-yellow-400" type="radio" />
+                    <input
+                      className="outline-yellow-400"
+                      type="radio"
+                      name="delivery-method"
+                    />
 
                     <p className="ml-3 font-bold">UPS, Secure Delivery</p>
                   </div>
@@ -92,7 +104,11 @@ export default function CheckoutDelivery() {
 
                 <div className="flex w-full cursor-pointer flex-col border">
                   <div className="flex bg-amber-400 px-4 py-2">
-                    <input className="outline-yellow-400" type="radio" />
+                    <input
+                      className="outline-yellow-400"
+                      type="radio"
+                      name="delivery-method"
+                    />
 
                     <p className="ml-3 font-bold">Pochta Rossii, 12 years</p>
                   </div>

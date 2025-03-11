@@ -1,8 +1,10 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { toast } from "react-toastify";
 
+const getWishlistFromLocal = JSON.parse(localStorage.getItem("wishlist"));
+
 const initialState = {
-  wishlistItems: [],
+  wishlistItems: getWishlistFromLocal ? getWishlistFromLocal : [],
 };
 
 export const wishlistSlice = createSlice({
@@ -17,17 +19,44 @@ export const wishlistSlice = createSlice({
       );
 
       if (checkIfAlreadyExist) {
-        state.wishlistItems = state.wishlistItems.filter(
-          (item) => item.id !== product.id
-        );
-        toast.success("Remove from wishlist!!");
+        const finalData = state.wishlistItems.filter((item) => {
+          return item.id !== product.id;
+        });
+
+        state.wishlistItems = finalData;
+        localStorage.setItem("wishlist", JSON.stringify(state.wishlistItems));
+        toast.success("Removed from wishlist!!");
       } else {
-        state.wishlistItems.push(product);
+        const data = {
+          id: product.id,
+          name: product.name,
+          image: product.image,
+          price: product.price,
+          categorySlug: product.category_slug,
+          discount: product.discount_percentage,
+          discountedPrice:
+            product.discounted_price > 0
+              ? Math.floor(
+                  product.price * (1 - product.discount_percentage / 100)
+                )
+              : product.price,
+          stock: product.stock,
+        };
+        const finalData = [...state.wishlistItems, data];
+        state.wishlistItems = finalData;
+        localStorage.setItem("wishlist", JSON.stringify(state.wishlistItems));
         toast.success("Add to wishlist!!");
       }
+    },
+    removeFromWishlist: (state, action) => {
+      const { id } = action.payload;
+      const finalData = state.wishlistItems.filter((item) => item.id !== id);
+
+      state.wishlistItems = finalData;
+      localStorage.setItem("wishlist", JSON.stringify(state.wishlistItems));
     },
   },
 });
 
-export const { addToWishlist } = wishlistSlice.actions;
+export const { addToWishlist, removeFromWishlist } = wishlistSlice.actions;
 export default wishlistSlice.reducer;

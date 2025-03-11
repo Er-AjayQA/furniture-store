@@ -29,32 +29,45 @@ export const cartSlice = createSlice({
           toast.success("Updating item quantity!!");
         }
       } else {
-        state.cartItems.push({ ...product, quantity: 1 });
+        const data = {
+          id: product.id,
+          name: product.name,
+          image: product.image,
+          price: product.price,
+          categorySlug: product.category_slug,
+          discountedPrice:
+            product.discounted_price > 0
+              ? Math.floor(
+                  product.price * (1 - product.discount_percentage / 100)
+                )
+              : product.price,
+          stock: product.stock,
+        };
+        const finalData = [...state.cartItems, { ...data, quantity: 1 }];
+        state.cartItems = finalData;
         toast.success("Successfully added to cart!!");
       }
 
       localStorage.setItem("cartItems", JSON.stringify(state.cartItems));
     },
     removeFromCart: (state, action) => {
-      const { product } = action.payload;
-      state.cartItems = state.cartItems.filter(
-        (item) => item.id !== product.id
-      );
-      toast.success("Removed from cart!!");
-
+      const { id } = action.payload;
+      const finalData = state.cartItems.filter((item) => item.id != id);
+      state.cartItems = finalData;
       localStorage.setItem("cartItems", JSON.stringify(state.cartItems));
+      toast.success("Removed from cart!!");
     },
     updateQuantity: (state, action) => {
-      const { product, type } = action.payload;
+      const { id, type, stock } = action.payload;
 
       state.cartItems = state.cartItems.map((item) => {
-        if (item.id === product.id) {
+        if (item.id === id) {
           if (type === "decrease") {
             return { ...item, quantity: item.quantity - 1 };
           }
 
           if (type === "increase") {
-            if (item.quantity >= product.stock) {
+            if (item.quantity >= stock) {
               toast.error("Cannot select more than stock availability!!");
               return item; // Return the item unchanged
             } else {

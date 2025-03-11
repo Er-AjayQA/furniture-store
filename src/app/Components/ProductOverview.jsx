@@ -128,16 +128,25 @@ export default function ProductOverview() {
   }, [productDetails, cartItems]);
 
   // Handle Product quantity Update
-  const handleProdQuantity = (product, type) => {
-    const prod = cartItems.find((item) => item.id === product.id);
+  const handleProdQuantity = (product, type, stock) => {
+    const productInCart = cartItems.find((item) => item.id === product.id);
 
-    if (prod) {
-      if (type === "decrease" && prod.quantity === 1) {
-        dispatch(removeFromCart({ product: prod }));
-      } else {
-        dispatch(updateQuantity({ product: prod, type }));
+    // If the product is already in the cart
+    if (productInCart) {
+      if (type === "decrease") {
+        if (productInCart.quantity === 1) {
+          dispatch(removeFromCart({ id: productInCart.id }));
+        } else {
+          setProductQuantity((prev) => prev - 1);
+          dispatch(updateQuantity({ id: productInCart.id, type, stock }));
+        }
+      } else if (type === "increase") {
+        dispatch(updateQuantity({ id: productInCart.id, type, stock }));
       }
-    } else if (!prod) {
+    }
+
+    // If the product is not in the cart
+    else if (!productInCart) {
       if (type === "decrease") {
         if (productQuantity > 1) {
           setProductQuantity((prev) => prev - 1);
@@ -312,7 +321,11 @@ export default function ProductOverview() {
                   <button
                     className="flex h-8 w-8 cursor-pointer items-center justify-center border duration-100 hover:bg-neutral-100 focus:ring-2 focus:ring-gray-500 active:ring-2 active:ring-gray-500"
                     onClick={() =>
-                      handleProdQuantity(productDetails, "decrease")
+                      handleProdQuantity(
+                        productDetails,
+                        "decrease",
+                        productDetails.stock
+                      )
                     }
                   >
                     &minus;
@@ -323,7 +336,11 @@ export default function ProductOverview() {
                   <button
                     className="flex h-8 w-8 cursor-pointer items-center justify-center border duration-100 hover:bg-neutral-100 focus:ring-2 focus:ring-gray-500 active:ring-2 active:ring-gray-500"
                     onClick={() =>
-                      handleProdQuantity(productDetails, "increase")
+                      handleProdQuantity(
+                        productDetails,
+                        "increase",
+                        productDetails.stock
+                      )
                     }
                   >
                     &#43;
