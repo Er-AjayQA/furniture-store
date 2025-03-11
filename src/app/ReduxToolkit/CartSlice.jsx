@@ -3,10 +3,11 @@ import { toast } from "react-toastify";
 const { createSlice } = require("@reduxjs/toolkit");
 
 // Get the Cart Value from Local Storage
-const getCartItemsFromLocal = JSON.parse(localStorage.getItem("cartItems"));
+var getCartData = JSON.parse(localStorage.getItem("cartItems"));
+var getCartData = getCartData ? getCartData : [];
 
 const initialState = {
-  cartItems: getCartItemsFromLocal ? getCartItemsFromLocal : [],
+  cartItems: getCartData ? getCartData : [],
 };
 
 export const cartSlice = createSlice({
