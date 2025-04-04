@@ -1,7 +1,13 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { toast } from "react-toastify";
 
-const getWishlistFromLocal = JSON.parse(localStorage.getItem("wishlist"));
+var getWishlistFromLocal = [];
+
+// Get the Cart Value from Local Storage
+if (typeof window !== "undefined") {
+  getWishlistFromLocal = JSON.parse(localStorage.getItem("wishlist"));
+  getWishlistFromLocal = getWishlistFromLocal ? getWishlistFromLocal : [];
+}
 
 const initialState = {
   wishlistItems: getWishlistFromLocal ? getWishlistFromLocal : [],
